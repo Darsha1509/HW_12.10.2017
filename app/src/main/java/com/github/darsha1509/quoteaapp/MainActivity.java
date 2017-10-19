@@ -22,7 +22,7 @@ public class MainActivity extends AppCompatActivity {
     Button setQuoteButton;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
@@ -33,7 +33,7 @@ public class MainActivity extends AppCompatActivity {
         getQuoteButton.setOnClickListener(new View.OnClickListener() {
 
             @Override
-            public void onClick(View pView) {
+            public void onClick(final View pView) {
                 new ReadingEndpointsAsyncTask().execute();
             }
         });
@@ -41,7 +41,7 @@ public class MainActivity extends AppCompatActivity {
         setQuoteButton.setOnClickListener(new View.OnClickListener() {
 
             @Override
-            public void onClick(View pView) {
+            public void onClick(final View pView) {
                 startActivity(new Intent(MainActivity.this, InsertActivity.class));
             }
         });
@@ -51,7 +51,7 @@ public class MainActivity extends AppCompatActivity {
         private  QuoteApi myApiService = null;
 
         @Override
-        protected String doInBackground(Void... pVoids) {
+        protected String doInBackground(final Void... pVoids) {
             if(myApiService == null) {  // Only do this once
                 myApiService = ApiBuilder.builApi();
             }
@@ -66,13 +66,13 @@ public class MainActivity extends AppCompatActivity {
                     result += q.getId().toString()+". \"" + q.getWhat()+"\"\n"+q.getWho()+"\n";
                 }
                 return result;
-            } catch (IOException e) {
+            } catch (final IOException e) {
                 return e.getMessage();
             }
         }
 
         @Override
-        protected void onPostExecute(String result) {
+        protected void onPostExecute(final String result) {
             qoutesTextView.setText(result);
         }
     }
