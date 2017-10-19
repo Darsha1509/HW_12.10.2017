@@ -8,16 +8,9 @@ import android.widget.Button;
 import android.widget.EditText;
 
 import com.example.dasha.quoteapp.backend.quoteApi.QuoteApi;
-import com.example.dasha.quoteapp.backend.quoteApi.model.CollectionResponseQuote;
 import com.example.dasha.quoteapp.backend.quoteApi.model.Quote;
-import com.google.api.client.extensions.android.http.AndroidHttp;
-import com.google.api.client.extensions.android.json.AndroidJsonFactory;
-import com.google.api.client.googleapis.services.AbstractGoogleClientRequest;
-import com.google.api.client.googleapis.services.GoogleClientRequestInitializer;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 public class InsertActivity extends AppCompatActivity {
 
@@ -45,33 +38,19 @@ public class InsertActivity extends AppCompatActivity {
                 String author = whoEditText.getText().toString();
                 String text = whatEditText.getText().toString();
 
-                new EndpointsAsyncTask().execute(id, author, text);
+                new InsertEndpointsAsyncTask().execute(id, author, text);
             }
         });
 
     }
 
-     class EndpointsAsyncTask extends AsyncTask<String, Void, Quote> {
+     class InsertEndpointsAsyncTask extends AsyncTask<String, Void, Quote> {
         private QuoteApi myApiService = null;
 
         @Override
         protected Quote doInBackground(String ...pVoids) {
             if(myApiService == null) {  // Only do this once
-                QuoteApi.Builder builder = new QuoteApi.Builder(AndroidHttp.newCompatibleTransport(),
-                        new AndroidJsonFactory(), null)
-                        // options for running against local devappserver
-                        // - 10.0.2.2 is localhost's IP address in Android emulator
-                        // - turn off compression when running against local devappserver
-                        .setRootUrl("http://10.0.2.2:8080/_ah/api/")
-                        .setGoogleClientRequestInitializer(new GoogleClientRequestInitializer() {
-                            @Override
-                            public void initialize(AbstractGoogleClientRequest<?> abstractGoogleClientRequest) throws IOException {
-                                abstractGoogleClientRequest.setDisableGZipContent(true);
-                            }
-                        });
-                // end options for devappserver
-
-                myApiService = builder.build();
+                myApiService = ApiBuilder.builApi();
             }
 
             Long id = Long.parseLong(pVoids[0]);

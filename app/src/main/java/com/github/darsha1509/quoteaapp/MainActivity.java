@@ -1,6 +1,5 @@
 package com.github.darsha1509.quoteaapp;
 
-import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
@@ -12,10 +11,6 @@ import android.widget.TextView;
 import com.example.dasha.quoteapp.backend.quoteApi.QuoteApi;
 import com.example.dasha.quoteapp.backend.quoteApi.model.CollectionResponseQuote;
 import com.example.dasha.quoteapp.backend.quoteApi.model.Quote;
-import com.google.api.client.extensions.android.http.AndroidHttp;
-import com.google.api.client.extensions.android.json.AndroidJsonFactory;
-import com.google.api.client.googleapis.services.AbstractGoogleClientRequest;
-import com.google.api.client.googleapis.services.GoogleClientRequestInitializer;
 
 import java.io.IOException;
 import java.util.List;
@@ -39,7 +34,7 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onClick(View pView) {
-                new EndpointsAsyncTask().execute();
+                new ReadingEndpointsAsyncTask().execute();
             }
         });
 
@@ -52,13 +47,13 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    class EndpointsAsyncTask extends AsyncTask<Void, Void, String> {
+    class ReadingEndpointsAsyncTask extends AsyncTask<Void, Void, String> {
         private  QuoteApi myApiService = null;
 
         @Override
         protected String doInBackground(Void... pVoids) {
             if(myApiService == null) {  // Only do this once
-                myApiService = builder.build();
+                myApiService = ApiBuilder.builApi();
             }
 
 
