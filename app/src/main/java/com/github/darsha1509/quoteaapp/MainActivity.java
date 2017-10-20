@@ -1,18 +1,16 @@
 package com.github.darsha1509.quoteaapp;
 
 import android.content.Intent;
-import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
-import com.example.dasha.quoteapp.backend.quoteApi.QuoteApi;
-import com.example.dasha.quoteapp.backend.quoteApi.model.CollectionResponseQuote;
-import com.example.dasha.quoteapp.backend.quoteApi.model.Quote;
+import com.github.darsha1509.quoteaapp.api.MyResponseListener;
+import com.github.darsha1509.quoteaapp.api.Quote;
+import com.github.darsha1509.quoteaapp.http.HttpClient;
 
-import java.io.IOException;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
@@ -34,7 +32,32 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onClick(final View pView) {
-                new ReadingEndpointsAsyncTask().execute();
+
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+
+                        final MyResponseListener listener = new MyResponseListener();
+                        new HttpClient().request(Constants.BASE_PATH, listener);
+                        if (listener.getThrowable() != null){
+                            throw new UnsupportedOperationException(listener.getThrowable());
+                        }
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                final List<Quote> quotes = listener.getQuoteList().getQuoteList();
+                                String result = "";
+                                for(final Quote q: quotes){
+                                    result += q.getId() +". \"" + q.getAuthor()+"\"\n"+q.getText()+"\n";
+                                }
+                                showResult(result);
+                            }
+                        });
+                    }
+                }).start();
+
+
+
             }
         });
 
@@ -47,33 +70,10 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    class ReadingEndpointsAsyncTask extends AsyncTask<Void, Void, String> {
-        private  QuoteApi myApiService = null;
+    protected void showResult(final CharSequence result) {
+        qoutesTextView.setText(result);
 
-        @Override
-        protected String doInBackground(final Void... pVoids) {
-            if(myApiService == null) {  // Only do this once
-                myApiService = ApiBuilder.builApi();
-            }
-
-
-            try {
-                //String quote = myApiService.get(1L).execute().getWhat();
-                CollectionResponseQuote list = myApiService.list().execute();
-                List<Quote> quotes = list.getItems();
-                String result = "";
-                for(Quote q: quotes){
-                    result += q.getId().toString()+". \"" + q.getWhat()+"\"\n"+q.getWho()+"\n";
-                }
-                return result;
-            } catch (final IOException e) {
-                return e.getMessage();
-            }
-        }
-
-        @Override
-        protected void onPostExecute(final String result) {
-            qoutesTextView.setText(result);
-        }
     }
+
 }
+
