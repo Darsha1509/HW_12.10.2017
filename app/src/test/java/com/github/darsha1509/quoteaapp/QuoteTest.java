@@ -7,7 +7,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
-import org.mockito.Mock;
+import org.mockito.Matchers;
+import org.mockito.Spy;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import java.util.ArrayList;
@@ -21,7 +22,7 @@ import static org.mockito.Mockito.verify;
 @RunWith(MockitoJUnitRunner.class)
 public class QuoteTest {
 
-    @Mock
+    @Spy
     private QuoteList mQuoteList;
 
     @Captor
@@ -36,6 +37,13 @@ public class QuoteTest {
         verify(quote).setAuthor(arg.capture());
 
         assertEquals("Ernest Hemingway", arg.getValue());
+
+        quote.setText("I\'m happy one");
+        verify(quote).setText(arg.capture());
+
+        doReturn("I\'m happy one").when(quote).getText();
+
+        assertEquals("I\'m happy one", arg.getValue());
     }
 
     @Test
@@ -48,6 +56,5 @@ public class QuoteTest {
 
         assertEquals("Ernest Hemingway", qouteCaptor.getValue().get(0).getAuthor());
 
-        //doReturn()
     }
 }
