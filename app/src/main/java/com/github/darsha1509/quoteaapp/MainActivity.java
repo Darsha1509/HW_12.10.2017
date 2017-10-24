@@ -38,7 +38,7 @@ public class MainActivity extends AppCompatActivity {
                     public void run() {
 
                         final MyResponseListener listener = new MyResponseListener();
-                        new HttpClient().request(Constants.BASE_PATH, listener);
+                        new HttpClient().requestGet(Constants.BASE_PATH, listener);
                         if (listener.getThrowable() != null){
                             throw new UnsupportedOperationException(listener.getThrowable());
                         }

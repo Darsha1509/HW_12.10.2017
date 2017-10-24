@@ -1,7 +1,8 @@
 package com.github.darsha1509.quoteaapp.http;
 
-public interface IHttpClient {
+interface IHttpClient {
 
-    void request(String url, HttpClient.ResponseListener listener);
+    void requestGet(String url, HttpClient.ResponseListener listener);
+    String requestPost(String url, String data);
 
 }

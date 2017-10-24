@@ -1,16 +1,14 @@
 package com.github.darsha1509.quoteaapp;
 
-import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 
-import com.example.dasha.quoteapp.backend.quoteApi.QuoteApi;
-import com.example.dasha.quoteapp.backend.quoteApi.model.Quote;
-
-import java.io.IOException;
+import com.github.darsha1509.quoteaapp.api.QuoteApi;
+import com.github.darsha1509.quoteaapp.http.HttpClient;
 
 public class InsertActivity extends AppCompatActivity {
 
@@ -20,7 +18,7 @@ public class InsertActivity extends AppCompatActivity {
     Button insertQuoteButton;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_insert);
 
@@ -32,42 +30,29 @@ public class InsertActivity extends AppCompatActivity {
         insertQuoteButton.setOnClickListener(new View.OnClickListener() {
 
             @Override
-            public void onClick(View pView) {
+            public void onClick(final View pView) {
 
-                String id = idEditText.getText().toString();
-                String author = whoEditText.getText().toString();
-                String text = whatEditText.getText().toString();
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        final String id = idEditText.getText().toString();
+                        final String author = whoEditText.getText().toString();
+                        final String text = whatEditText.getText().toString();
 
-                new InsertEndpointsAsyncTask().execute(id, author, text);
+                        final String data = new QuoteApi().createQuote(id, author, text);
+                        new HttpClient().requestPost("https://quoteapp-183210.appspot.com/_ah/api/quoteApi/v1/quote", data);
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                Toast.makeText(InsertActivity.this, "New quote is created!", Toast.LENGTH_SHORT).show();
+                                finish();
+                            }
+                        });
+                    }
+                }).start();
             }
         });
 
     }
 
-     class InsertEndpointsAsyncTask extends AsyncTask<String, Void, Quote> {
-        private QuoteApi myApiService = null;
-
-        @Override
-        protected Quote doInBackground(String ...pVoids) {
-            if(myApiService == null) {  // Only do this once
-                myApiService = ApiBuilder.builApi();
-            }
-
-            Long id = Long.parseLong(pVoids[0]);
-            String author = pVoids[1];
-            String text = pVoids[2];
-
-            try {
-                return myApiService.insert(author, id, text).execute();
-            } catch (IOException e) {
-                e.getMessage();
-                return null;
-            }
-        }
-
-        @Override
-        protected void onPostExecute(Quote result) {
-            finish();
-        }
-    }
 }
