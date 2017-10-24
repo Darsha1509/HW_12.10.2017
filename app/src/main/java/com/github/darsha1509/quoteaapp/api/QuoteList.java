@@ -13,4 +13,7 @@ public class QuoteList {
         return quoteList;
     }
 
+    public void setQuoteList(List<Quote> pQuoteList) {
+        quoteList = pQuoteList;
+    }
 }
